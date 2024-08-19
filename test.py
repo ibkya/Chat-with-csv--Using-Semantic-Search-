@@ -9,7 +9,6 @@ from llama_index.prompts import PromptTemplate
 import os
 import matplotlib.pyplot as plt
 
-
 # API Anahtarı
 api_key = os.getenv("OPENAI_API_KEY")
 
@@ -51,7 +50,7 @@ if uploaded_file is not None:
         faiss.normalize_L2(query_embedding)
 
         # FAISS üzerinden en yakın sütunları bul
-        k = 3  # En yakın 2 sütun
+        k = 3  # En yakın 3 sütun
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
@@ -92,7 +91,7 @@ if uploaded_file is not None:
             response_synthesis_prompt = PromptTemplate(
                 "Girdiğiniz soruya göre, sorgu sonuçlarından detaylı bir yanıt üretin.\n"
                 "Sorgu: {query_str}\n\n"
-                "Pandas Talimatları (isteğe bağlı):\n{pandas_instructions}\n\n"
+                "Pandas Talimatları:\n{pandas_instructions}\n\n"
                 "Pandas Çıktısı: {pandas_output}\n\n"
                 "Yanıt: "
             )
@@ -122,11 +121,16 @@ if uploaded_file is not None:
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
-            fig, ax = plt.subplots()
+            
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
+            llm1_output = response.message["llm1"]
+
             st.write("Yanıt:")
             st.write(response.message.content)
-
-            if "plt" in response.message.content:
-                st.pyplot(fig=plt.gcf())
+            
+            # Eğer `llm1` çıktısında matplotlib grafiği varsa göster
+            if "plt" in llm1_output:
+                fig, ax = plt.subplots()
+                exec(llm1_output)
+                st.pyplot(fig=fig)
