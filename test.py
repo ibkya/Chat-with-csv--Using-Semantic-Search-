@@ -18,7 +18,7 @@ st.title("CSV Dosyası Yükleme ve Semantik Arama")
 st.write("CSV dosyanızı yükleyin ve sorgunuzu girin.")
 
 # LLM seçimi
-model_type = st.selectbox("Kullanmak istediğiniz dil modelini seçin", ["OpenAI"])
+model_type = st.selectbox("Kullanmak istediğiniz dil modelini seçin", ["OpenAI", "Llama-3.1:8B","Llama-3.1:70B"])
 llm = OpenAI(model="gpt-3.5-turbo")
 
 # CSV dosyasını yükle
