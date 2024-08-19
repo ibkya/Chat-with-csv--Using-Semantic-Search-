@@ -9,23 +9,24 @@ from llama_index.prompts import PromptTemplate
 import os
 import matplotlib.pyplot as plt
 
+
 # API Anahtarı
 api_key = os.getenv("OPENAI_API_KEY")
 
 # Streamlit başlat
-st.title("Talk and visualize your CSV file")
-st.write("Select the csv file you want to")
+st.title("CSV Dosyası Yükleme ve Semantik Arama")
+st.write("CSV dosyanızı yükleyin ve sorgunuzu girin.")
 
 # LLM seçimi
-model_type = st.selectbox("Select the model you want to use", ["OpenAI"])
+model_type = st.selectbox("Kullanmak istediğiniz dil modelini seçin", ["OpenAI"])
 llm = OpenAI(model="gpt-3.5-turbo")
 
 # CSV dosyasını yükle
-uploaded_file = st.file_uploader("Upload a csv file", type=["csv"])
+uploaded_file = st.file_uploader("Bir CSV dosyası yükleyin", type=["csv"])
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
-    st.write("Uploaded Data:")
+    st.write("Yüklenen veri:")
     st.write(df.head())
 
     # SentenceTransformer modelini yükleme
@@ -42,7 +43,7 @@ if uploaded_file is not None:
     index.add(column_embeddings)  # Tüm sütun vektörlerini ekleme
 
     # Sorgu girişi
-    query_str = st.text_input("Enter your query", value="")
+    query_str = st.text_input("Sorgunuzu girin", value="")
 
     if query_str:
         # Sorguyu vektörleştir ve normalize et
@@ -50,16 +51,16 @@ if uploaded_file is not None:
         faiss.normalize_L2(query_embedding)
 
         # FAISS üzerinden en yakın sütunları bul
-        k = 3  # En yakın 3 sütun
+        k = 3  # En yakın 2 sütun
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
-        st.write("Relevant columns", relevant_columns)
+        st.write("İlgili sütun(lar):", relevant_columns)
 
         # Sorgu, yalnızca seçilen sütunlar üzerinden gerçekleştirilecek
         if relevant_columns:
             selected_columns = relevant_columns  # En yakın sütunları seç
-            st.write(f"The query will be performed only on the following columns: {selected_columns}")
+            st.write(f"Sorgu sadece şu sütunlar üzerinden gerçekleştirilecek: {selected_columns}")
             
             # Pandas sorgusu için talimatları dinamik olarak oluştur
             instruction_str = (
@@ -121,16 +122,9 @@ if uploaded_file is not None:
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
-            
+            fig, ax = plt.subplots()
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-            llm1_output = response.message["llm1"]
-
-            st.write("Response from model")
+            st.write("Yanıt:")
             st.write(response.message.content)
-            
-            # Eğer `llm1` çıktısında matplotlib grafiği varsa göster
-            if "plt" in llm1_output:
-                fig, ax = plt.subplots()
-                exec(llm1_output)
-                st.pyplot(fig=fig)
+            st.pyplot(fig=fig)
