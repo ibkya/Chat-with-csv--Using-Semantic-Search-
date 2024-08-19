@@ -7,7 +7,7 @@ from llama_index.query_engine.pandas import PandasInstructionParser
 from llama_index.llms import OpenAI
 from llama_index.prompts import PromptTemplate
 import os
-import plotly.express as px
+import matplotlib.pyplot as plt
 
 
 # API Anahtarı
