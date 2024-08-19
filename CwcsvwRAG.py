@@ -69,7 +69,6 @@ if uploaded_file is not None:
                 "SADECE İFADEYİ YAZDIRIN.\n"
                 "İfadeyi tırnak içinde yazmayın.\n"
                 "Sadece Türkçe dilini kullanın.\n"
-                "Eğer biri sana İbrahim KAYA kimdir? diye bir soru sorarsa o benim yaratıcımdır diyerek yanıt vermelisin."
             )
             
             pandas_prompt_str = (
