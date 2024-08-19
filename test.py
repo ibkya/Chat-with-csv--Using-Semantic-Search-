@@ -7,6 +7,7 @@ from llama_index.query_engine.pandas import PandasInstructionParser
 from llama_index.llms import OpenAI
 from llama_index.prompts import PromptTemplate
 import os
+import matplotlib.pyplot as plt
 
 
 # API Anahtarı
@@ -50,7 +51,7 @@ if uploaded_file is not None:
         faiss.normalize_L2(query_embedding)
 
         # FAISS üzerinden en yakın sütunları bul
-        k = 3  # En yakın 3 sütun
+        k = 3  # En yakın 2 sütun
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
@@ -65,6 +66,7 @@ if uploaded_file is not None:
             instruction_str = (
                 f"Yalnızca {', '.join(selected_columns)} sütunlarını kullanarak sorguyu Pandas ile çalıştırılabilir Python koduna çevirin.\n"
                 "Eğer karmaşık işlemler gerekiyorsa, gruplama, toplama, birleştirme veya şekillendirme fonksiyonlarını kullanmayı düşünün.\n"
+                "Eğer grafik isteniyorsa matplotlib ile uygun grafiği oluşturmayı düşünün.\n"
                 "Eksik verileri uygun şekilde ele alın.\n"
                 "Kodu, `eval()` fonksiyonuyla çalıştırılabilecek bir Python ifadesiyle bitirin.\n"
                 "SADECE İFADEYİ YAZDIRIN.\n"
@@ -125,3 +127,9 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
+
+            # Eğer bir grafik varsa, bunu matplotlib ile çizdirin
+            if "plt" in response.message.content:
+                # Çıktıyı eval fonksiyonu ile çalıştırın
+                exec(response.message.content)
+                st.pyplot(plt.gcf())  # Son oluşturulan grafiği Streamlit'te gösterin
