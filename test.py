@@ -13,19 +13,19 @@ import matplotlib.pyplot as plt
 api_key = os.getenv("OPENAI_API_KEY")
 
 # Streamlit başlat
-st.title("CSV Dosyası Yükleme ve Semantik Arama")
-st.write("CSV dosyanızı yükleyin ve sorgunuzu girin.")
+st.title("Talk and visualize your CSV file")
+st.write("Select the csv file you want to")
 
 # LLM seçimi
-model_type = st.selectbox("Kullanmak istediğiniz dil modelini seçin", ["OpenAI"])
+model_type = st.selectbox("Select the model you want to use", ["OpenAI"])
 llm = OpenAI(model="gpt-3.5-turbo")
 
 # CSV dosyasını yükle
-uploaded_file = st.file_uploader("Bir CSV dosyası yükleyin", type=["csv"])
+uploaded_file = st.file_uploader("Upload a csv file", type=["csv"])
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
-    st.write("Yüklenen veri:")
+    st.write("Uploaded Data:")
     st.write(df.head())
 
     # SentenceTransformer modelini yükleme
@@ -42,7 +42,7 @@ if uploaded_file is not None:
     index.add(column_embeddings)  # Tüm sütun vektörlerini ekleme
 
     # Sorgu girişi
-    query_str = st.text_input("Sorgunuzu girin", value="")
+    query_str = st.text_input("Enter your query", value="")
 
     if query_str:
         # Sorguyu vektörleştir ve normalize et
@@ -54,12 +54,12 @@ if uploaded_file is not None:
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
-        st.write("İlgili sütun(lar):", relevant_columns)
+        st.write("Relevant columns", relevant_columns)
 
         # Sorgu, yalnızca seçilen sütunlar üzerinden gerçekleştirilecek
         if relevant_columns:
             selected_columns = relevant_columns  # En yakın sütunları seç
-            st.write(f"Sorgu sadece şu sütunlar üzerinden gerçekleştirilecek: {selected_columns}")
+            st.write(f"The query will be performed only on the following columns: {selected_columns}")
             
             # Pandas sorgusu için talimatları dinamik olarak oluştur
             instruction_str = (
@@ -126,7 +126,7 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             llm1_output = response.message["llm1"]
 
-            st.write("Yanıt:")
+            st.write("Response from model")
             st.write(response.message.content)
             
             # Eğer `llm1` çıktısında matplotlib grafiği varsa göster
