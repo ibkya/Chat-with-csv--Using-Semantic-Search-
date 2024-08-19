@@ -122,7 +122,7 @@ if uploaded_file is not None:
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
-
+            fig, ax = plt.subplot()
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
