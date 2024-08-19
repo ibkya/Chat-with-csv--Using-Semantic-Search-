@@ -3,3 +3,4 @@ arize-phoenix>=4.0.0
 openai
 faiss-cpu
 sentence-transformers
+plotly

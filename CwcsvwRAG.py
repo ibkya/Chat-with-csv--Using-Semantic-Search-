@@ -7,6 +7,8 @@ from llama_index.query_engine.pandas import PandasInstructionParser
 from llama_index.llms import OpenAI
 from llama_index.prompts import PromptTemplate
 import os
+import plotly.express as px
+
 
 # API Anahtarı
 api_key = os.getenv("OPENAI_API_KEY")
@@ -64,6 +66,7 @@ if uploaded_file is not None:
             instruction_str = (
                 f"Yalnızca {', '.join(selected_columns)} sütunlarını kullanarak sorguyu Pandas ile çalıştırılabilir Python koduna çevirin.\n"
                 "Eğer karmaşık işlemler gerekiyorsa, gruplama, toplama, birleştirme veya şekillendirme fonksiyonlarını kullanmayı düşünün.\n"
+                "Eğer grafik isteniyorsa plotly.express ile uygun grafiği oluşturmayı düşünün.\n"
                 "Eksik verileri uygun şekilde ele alın.\n"
                 "Kodu, `eval()` fonksiyonuyla çalıştırılabilecek bir Python ifadesiyle bitirin.\n"
                 "SADECE İFADEYİ YAZDIRIN.\n"
