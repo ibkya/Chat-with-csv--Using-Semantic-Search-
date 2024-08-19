@@ -127,9 +127,4 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-
-            # Eğer bir grafik varsa, bunu matplotlib ile çizdirin
-            if "plt" in response.message.content:
-                # Çıktıyı eval fonksiyonu ile çalıştırın
-                exec(response.message.content)
-                st.pyplot(plt.gcf())  # Son oluşturulan grafiği Streamlit'te gösterin
+            st.pyplot(fig)
