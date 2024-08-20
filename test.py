@@ -127,6 +127,6 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-            llm1_response = response.message.content['llm1']
-            st.write(llm1_response)
+            st.write("response:")
+            st.write(response)
             st.pyplot(fig=fig)
