@@ -127,5 +127,5 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-            st.write(pandas_prompt)
+            st.write(pandas_output_parser)
             st.pyplot(fig=fig)
