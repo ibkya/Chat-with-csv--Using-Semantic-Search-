@@ -127,4 +127,6 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-            st.pyplot(fig=fig)
+            
+            if "grafik" in response.message.content:
+                st.pyplot(fig=fig)
