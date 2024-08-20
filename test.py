@@ -51,11 +51,11 @@ if uploaded_file is not None:
         faiss.normalize_L2(query_embedding)
 
         # FAISS üzerinden en yakın sütunları bul
-        k = 3  # En yakın 2 sütun
+        k = 3  # En yakın 3 sütun
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
-        st.write("İlgili sütun(lar):", relevant_columns)
+        st.write("İlgili sütunlar:", relevant_columns)
 
         # Sorgu, yalnızca seçilen sütunlar üzerinden gerçekleştirilecek
         if relevant_columns:
@@ -127,6 +127,8 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-            
+
             if "grafik" in response.message.content:
+                st.session_state['fig'] = fig
                 st.pyplot(fig=fig)
+                plt.close(fig)
