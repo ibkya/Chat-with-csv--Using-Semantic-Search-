@@ -128,5 +128,5 @@ if uploaded_file is not None:
             st.write("Yanıt:")
             st.write(response.message.content)
             st.write("response:")
-            st.write(response)
+            st.write(query_str)
             st.pyplot(fig=fig)
