@@ -126,7 +126,10 @@ if uploaded_file is not None:
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
             # Yanıtın tüm özelliklerini listele
-            st.write("Response attributes:")
-            st.write(dir(response))
+            # LLM1'den gelen talimatları manuel olarak almak için:
+            llm1_output = qp.modules['llm1'].run(pandas_prompt)
+
+            st.write("Pandas Talimatları (LLM1 Çıktısı):")
+            st.write(llm1_output)
             st.write(response.message.content)
             st.pyplot(fig=fig)
