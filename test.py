@@ -125,11 +125,20 @@ if uploaded_file is not None:
             fig, ax = plt.subplots()
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-            # Yanıtın tüm özelliklerini listele
-            # LLM1'den gelen talimatları manuel olarak almak için:
-            llm1_output = qp.modules['llm1'].run(pandas_prompt)
+            pandas_instructions = llm(pandas_prompt)
 
             st.write("Pandas Talimatları (LLM1 Çıktısı):")
-            st.write(llm1_output)
-            st.write(response.message.content)
-            st.pyplot(fig=fig)
+            st.write(pandas_instructions)
+
+            # Pandas çıktısını işleyin
+            pandas_output = pandas_output_parser.parse(pandas_instructions)
+
+            # Son yanıtı oluşturmak için response_synthesis_prompt'u çalıştır
+            response_synthesis = response_synthesis_prompt.format(
+                query_str=query_str, pandas_instructions=pandas_instructions, pandas_output=pandas_output
+            )
+            final_response = llm(response_synthesis)
+
+            # Yanıtı ekrana yazdır
+            st.write("Yanıt:")
+            st.write(final_response)
