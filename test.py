@@ -124,31 +124,9 @@ if uploaded_file is not None:
             qp.add_link("response_synthesis_prompt", "llm2")
             fig, ax = plt.subplots()
             # Sorguyu çalıştır
-# Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-
-            # Yanıtı metin olarak al
-            response_text = response.message.content
-
-            # Yanıtı ekrana yazdır
+            st.write("Pandas Talimatları:")
+            st.write(response.steps[2].output)
             st.write("Yanıt:")
-            st.write(response_text)
-
-            # Pandas talimatlarını ve çıktısını ayrıştır
-            instructions_marker = "Pandas Talimatları:"
-            output_marker = "Pandas Çıktısı:"
-            response_marker = "Yanıt:"
-
-            if instructions_marker in response_text and output_marker in response_text:
-                # Talimatlar ve çıktı arasındaki metni ayır
-                pandas_instructions = response_text.split(instructions_marker)[1].split(output_marker)[0].strip()
-                pandas_output = response_text.split(output_marker)[1].split(response_marker)[0].strip()
-                
-                # Ekrana yazdır
-                st.write("Pandas Talimatları:")
-                st.write(pandas_instructions)
-                
-                st.write("Pandas Çıktısı:")
-                st.write(pandas_output)
-            else:
-                st.write("Beklenen formatta veri bulunamadı.")
+            st.write(response.message.content)
+            st.pyplot(fig=fig)
