@@ -139,7 +139,7 @@ if uploaded_file is not None:
 
             # Sorgu sonucunu yazdır
             print("Pandas Çıktısı:")
-            print(pandas_output)
+            st.write(pandas_output)
 
             # Yanıtı yazdır
             print("Yanıt:")
