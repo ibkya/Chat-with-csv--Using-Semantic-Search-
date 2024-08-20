@@ -125,8 +125,8 @@ if uploaded_file is not None:
             fig, ax = plt.subplots()
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-            st.write("Pandas Talimatları:")
-            st.write(response.steps[2].output)
-            st.write("Yanıt:")
+            # Yanıtın tüm özelliklerini listele
+            st.write("Response attributes:")
+            st.write(dir(response))
             st.write(response.message.content)
             st.pyplot(fig=fig)
