@@ -9,7 +9,6 @@ from llama_index.prompts import PromptTemplate
 import os
 import matplotlib.pyplot as plt
 
-
 # API Anahtarı
 api_key = os.getenv("OPENAI_API_KEY")
 
@@ -18,7 +17,7 @@ st.title("CSV Dosyası Yükleme ve Semantik Arama")
 st.write("CSV dosyanızı yükleyin ve sorgunuzu girin.")
 
 # LLM seçimi
-model_type = st.selectbox("Kullanmak istediğiniz dil modelini seçin", ["OpenAI", "Llama-3.1:8B","Llama-3.1:70B"])
+model_type = st.selectbox("Kullanmak istediğiniz dil modelini seçin", ["OpenAI", "Llama-3.1:8B", "Llama-3.1:70B"])
 llm = OpenAI(model="gpt-3.5-turbo")
 
 # CSV dosyasını yükle
@@ -131,6 +130,6 @@ if uploaded_file is not None:
             # Kod içinde "plt" geçiyorsa grafiği çizdir
             if "plt" in response.message.content:
                 exec(response.message.content)
-                st.pyplot(fig=plt)
+                st.pyplot()
             else:
                 st.write("Bu sorgu için bir grafik oluşturulmadı.")
