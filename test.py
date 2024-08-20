@@ -51,7 +51,7 @@ if uploaded_file is not None:
         faiss.normalize_L2(query_embedding)
 
         # FAISS üzerinden en yakın sütunları bul
-        k = 3  # En yakın 2 sütun
+        k = 3  # En yakın 3 sütun
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
@@ -122,9 +122,15 @@ if uploaded_file is not None:
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
-            fig, ax = plt.subplots()
+
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-            st.pyplot(fig=fig)
+            
+            # Kod içinde "plt" geçiyorsa grafiği çizdir
+            if "plt" in response.message.content:
+                exec(response.message.content)
+                st.pyplot(fig=plt)
+            else:
+                st.write("Bu sorgu için bir grafik oluşturulmadı.")
