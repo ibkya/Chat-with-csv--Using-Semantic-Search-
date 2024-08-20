@@ -127,23 +127,28 @@ if uploaded_file is not None:
 # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
 
-            # Pandas talimatları ve çıktılarını yazdırmak için
-            if hasattr(response, 'message') and hasattr(response.message, 'content'):
-                content = response.message.content
-                st.write("Yanıt:")
-                st.write(content)
-                
-                # İçerikten talimatları ve çıktıları ayıklayın
-                instructions_start = content.find("Pandas Talimatları:") + len("Pandas Talimatları:")
-                output_start = content.find("Pandas Çıktısı:") + len("Pandas Çıktısı:")
-                
-                pandas_instructions = content[instructions_start:output_start].strip()
-                pandas_output = content[output_start:].strip()
+            # Yanıtı metin olarak al
+            response_text = response.message.content
 
+            # Yanıtı ekrana yazdır
+            st.write("Yanıt:")
+            st.write(response_text)
+
+            # Pandas talimatlarını ve çıktısını ayrıştır
+            instructions_marker = "Pandas Talimatları:"
+            output_marker = "Pandas Çıktısı:"
+            response_marker = "Yanıt:"
+
+            if instructions_marker in response_text and output_marker in response_text:
+                # Talimatlar ve çıktı arasındaki metni ayır
+                pandas_instructions = response_text.split(instructions_marker)[1].split(output_marker)[0].strip()
+                pandas_output = response_text.split(output_marker)[1].split(response_marker)[0].strip()
+                
+                # Ekrana yazdır
                 st.write("Pandas Talimatları:")
                 st.write(pandas_instructions)
                 
                 st.write("Pandas Çıktısı:")
                 st.write(pandas_output)
             else:
-                st.write("Yanıt beklenildiği gibi değil.")
+                st.write("Beklenen formatta veri bulunamadı.")
