@@ -127,20 +127,23 @@ if uploaded_file is not None:
 # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
 
-            # Sorguyu çalıştır
+            # Pandas talimatları ve çıktılarını yazdırmak için
+            if hasattr(response, 'message') and hasattr(response.message, 'content'):
+                content = response.message.content
+                st.write("Yanıt:")
+                st.write(content)
+                
+                # İçerikten talimatları ve çıktıları ayıklayın
+                instructions_start = content.find("Pandas Talimatları:") + len("Pandas Talimatları:")
+                output_start = content.find("Pandas Çıktısı:") + len("Pandas Çıktısı:")
+                
+                pandas_instructions = content[instructions_start:output_start].strip()
+                pandas_output = content[output_start:].strip()
 
-            # 'response_synthesis_prompt' modülünden 'pandas_instructions' ve 'pandas_output' öğelerini al
-            pandas_instructions = response["response_synthesis_prompt"]["pandas_instructions"]
-            pandas_output = response["response_synthesis_prompt"]["pandas_output"]
-
-            # Pandas talimatlarını yazdır
-            print("Pandas Talimatları:")
-            print(pandas_instructions)
-
-            # Sorgu sonucunu yazdır
-            print("Pandas Çıktısı:")
-            st.write(pandas_output)
-
-            # Yanıtı yazdır
-            print("Yanıt:")
-            print(response["llm2"].message.content)
+                st.write("Pandas Talimatları:")
+                st.write(pandas_instructions)
+                
+                st.write("Pandas Çıktısı:")
+                st.write(pandas_output)
+            else:
+                st.write("Yanıt beklenildiği gibi değil.")
