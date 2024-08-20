@@ -127,5 +127,10 @@ if uploaded_file is not None:
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
             st.write(response.message.content)
-            st.write(pandas_output_parser)
+            # Pandas talimatlarını al
+            pandas_instructions = response.message.content['pandas_instructions']
+
+            # Talimatları yazdır
+            st.write("Pandas Talimatları:")
+            st.write(pandas_instructions)
             st.pyplot(fig=fig)
