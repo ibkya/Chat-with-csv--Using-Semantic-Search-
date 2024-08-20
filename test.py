@@ -2,12 +2,13 @@ import pandas as pd
 import streamlit as st
 import faiss
 from sentence_transformers import SentenceTransformer
-from llama_index.query_pipeline import QueryPipeline as QP, Link, InputComponent, OutputComponent
+from llama_index.query_pipeline import QueryPipeline as QP, Link, InputComponent
 from llama_index.query_engine.pandas import PandasInstructionParser
 from llama_index.llms import OpenAI
 from llama_index.prompts import PromptTemplate
 import os
 import matplotlib.pyplot as plt
+
 
 # API Anahtarı
 api_key = os.getenv("OPENAI_API_KEY")
@@ -96,14 +97,7 @@ if uploaded_file is not None:
                 "Yanıt: "
             )
 
-            # Pandas talimatlarını sadece yazdırmak için bir modül ekleyin
-            class PrintPandasInstructions(OutputComponent):
-                def run(self, pandas_instructions):
-                    st.write("Pandas Talimatları (LLM1 Çıktısı):")
-                    st.write(pandas_instructions)
-                    return pandas_instructions
-
-            # Yeni modülü QP'ye ekleyin
+            # QueryPipeline oluşturma
             qp = QP(
                 modules={
                     "input": InputComponent(),
@@ -112,26 +106,25 @@ if uploaded_file is not None:
                     "pandas_output_parser": pandas_output_parser,
                     "response_synthesis_prompt": response_synthesis_prompt,
                     "llm2": llm,
-                    "print_instructions": PrintPandasInstructions(),
                 },
                 verbose=True,
             )
-
-            # Chain ve Link ekleyin
-            qp.add_chain(["input", "pandas_prompt", "llm1", "print_instructions", "pandas_output_parser"])
+            qp.add_chain(["input", "pandas_prompt", "llm1", "pandas_output_parser"])
             qp.add_links(
                 [
                     Link("input", "response_synthesis_prompt", dest_key="query_str"),
                     Link("llm1", "response_synthesis_prompt", dest_key="pandas_instructions"),
-                    Link("pandas_output_parser", "response_synthesis_prompt", dest_key="pandas_output"),
+                    Link(
+                        "pandas_output_parser",
+                        "response_synthesis_prompt",
+                        dest_key="pandas_output",
+                    ),
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
-
+            fig, ax = plt.subplots()
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-            
-            # Yanıtı ekrana yazdır
             st.write("Yanıt:")
             st.write(response.message.content)
-            
+            st.pyplot(fig=fig)
