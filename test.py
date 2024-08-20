@@ -126,10 +126,10 @@ if uploaded_file is not None:
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
             st.write("Yanıt:")
-            st.write(response.message.content)
 
             # `llm1` tarafından üretilen kodu kontrol et
-            generated_code = response.steps['llm1'].output['generated_code']
+            llm1_response = response.responses['llm1']
+            generated_code = llm1_response['text']  # Üretilen kodu burada alıyoruz
             
             # Eğer `plt` ifadesi varsa grafiği oluştur
             if "plt" in generated_code:
