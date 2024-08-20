@@ -127,15 +127,20 @@ if uploaded_file is not None:
 # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
 
-            # Yanıt içinden 'pandas_instructions' ve 'pandas_output' öğelerini çıkarın
+            # Sorguyu çalıştır
+
+            # 'response_synthesis_prompt' modülünden 'pandas_instructions' ve 'pandas_output' öğelerini al
             pandas_instructions = response["response_synthesis_prompt"]["pandas_instructions"]
             pandas_output = response["response_synthesis_prompt"]["pandas_output"]
 
             # Pandas talimatlarını yazdır
-            st.write("Pandas Talimatları:")
-            st.write(pandas_instructions)
+            print("Pandas Talimatları:")
+            print(pandas_instructions)
+
+            # Sorgu sonucunu yazdır
+            print("Pandas Çıktısı:")
+            print(pandas_output)
 
             # Yanıtı yazdır
-            st.write("Yanıt:")
-            st.write(response.message.content)
-            st.pyplot(fig=fig)
+            print("Yanıt:")
+            print(response["llm2"].message.content)
