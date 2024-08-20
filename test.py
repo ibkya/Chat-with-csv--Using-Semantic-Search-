@@ -128,5 +128,6 @@ if uploaded_file is not None:
             st.write("Yanıt:")
             st.write(response.message.content)
             st.write("response:")
-            st.write(query_str)
+            llm1_generated_code = response['llm1']['result']
+            st.write(llm1_generated_code)
             st.pyplot(fig=fig)
