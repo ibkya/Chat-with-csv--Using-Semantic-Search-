@@ -51,7 +51,7 @@ if uploaded_file is not None:
         faiss.normalize_L2(query_embedding)
 
         # FAISS üzerinden en yakın sütunları bul
-        k = 3  # En yakın 3 sütun
+        k = 3  # En yakın 2 sütun
         distances, indices = index.search(query_embedding, k)
         relevant_columns = [df.columns[i] for i in indices[0]]
         
@@ -122,22 +122,11 @@ if uploaded_file is not None:
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
-
+            fig, ax = plt.subplots()
             # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-            
-            # `llm1` tarafından üretilen kodu al
-            llm1_response = response.responses['llm1']
-            generated_code = llm1_response['text']  # Üretilen kodu burada alıyoruz
-            
-            # Üretilen kodu ekranda göster
-            st.write("Üretilen Python Kodu:")
-            st.code(generated_code, language="python")
-            
-            # Eğer `plt` ifadesi varsa grafiği oluştur
-            if "plt" in generated_code:
-                fig, ax = plt.subplots()
-                exec(generated_code)
-                st.pyplot(fig=fig)
-            else:
-                st.write("Grafik oluşturulmadı çünkü plt ifadesi kodda bulunmadı.")
+            st.write("Yanıt:")
+            st.write(response.message.content)
+            llm1_response = response.message.content['llm1']
+            st.write(llm1_response)
+            st.pyplot(fig=fig)
