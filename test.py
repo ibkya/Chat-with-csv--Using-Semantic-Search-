@@ -128,7 +128,7 @@ if uploaded_file is not None:
             st.write("Yanıt:")
             st.write(response.message.content)
             # Pandas talimatlarını al
-            pandas_instructions = response.message.content['pandas_instructions']
+            pandas_instructions = response.context['pandas_instructions']
 
             # Talimatları yazdır
             st.write("Pandas Talimatları:")
