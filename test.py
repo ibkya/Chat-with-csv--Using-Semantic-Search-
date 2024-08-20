@@ -124,13 +124,19 @@ if uploaded_file is not None:
             qp.add_link("response_synthesis_prompt", "llm2")
             fig, ax = plt.subplots()
             # Sorguyu çalıştır
+            # Sorguyu çalıştır
             response = qp.run(query_str=query_str)
-            st.write("Yanıt:")
-            st.write(response.message.content)
-            # Pandas talimatlarını al
-            pandas_instructions = response.context['pandas_instructions']
+
+            # Talimatlar modülü sonuçlarını almak
+            if "response_synthesis_prompt" in response:
+                pandas_instructions = response["response_synthesis_prompt"].get("pandas_instructions", "Talimatlar bulunamadı.")
+            else:
+                pandas_instructions = "Talimatlar bulunamadı."
 
             # Talimatları yazdır
             st.write("Pandas Talimatları:")
             st.write(pandas_instructions)
+
+            st.write("Yanıt:")
+            st.write(response.get("message", {}).get("content", "Yanıt bulunamadı."))
             st.pyplot(fig=fig)
