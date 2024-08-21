@@ -3,7 +3,7 @@
 
 ## Giriş
 
-Bu proje, kullanıcıların CSV dosyalarını yükleyerek semantik arama yapmalarını sağlayan bir Streamlit uygulamasıdır. Uygulama, FAISS (Facebook AI Similarity Search) ve SentenceTransformers kütüphanelerini kullanarak CSV dosyasındaki sütun adlarını vektörleştirir ve kullanıcının sorgusuna en uygun sütunları belirler. Ardından, LLM (Large Language Model) desteğiyle seçilen sütunlar üzerinden sorgu gerçekleştirilir ve ilgili sonuçlar kullanıcılara sunulur.
+Bu proje, kullanıcıların CSV dosyalarını yükleyerek soru cevap yapmanızı sağlayan bir Streamlit uygulamasıdır. Uygulama, FAISS (Facebook AI Similarity Search) ve SentenceTransformers kütüphanelerini kullanarak CSV dosyasındaki sütun adlarını vektörleştirir ve kullanıcının sorgusuna en uygun sütunları belirler. Ardından, LLM (Large Language Model) desteğiyle seçilen sütunlar üzerinden sorgu gerçekleştirilir ve ilgili sonuçlar kullanıcılara sunulur. Üstelik kullanıcı bir görselleştirme sorgusu gönderirse sistem son kullanıcıya sorgusuna göre bir grafik oluşturmaktadır.
 
 ## Gereksinimler
 
@@ -16,6 +16,7 @@ Aşağıdaki Python paketlerinin yüklü olduğundan emin olun:
 - `sentence-transformers`
 - `pandas`
 - `streamlit`
+- `matplotlib`
 
 Bu paketler, semantik arama, doğal dil işleme ve LLM tabanlı sorgulama işlemlerini gerçekleştirmek için gereklidir.
 
@@ -24,7 +25,7 @@ Bu paketler, semantik arama, doğal dil işleme ve LLM tabanlı sorgulama işlem
 1. Gerekli kütüphaneleri yükleyin:
 
    ```bash
-   pip install llama-index==0.9.45.post1 arize-phoenix>=4.0.0 openai faiss-cpu sentence-transformers pandas streamlit
+   pip install llama-index==0.9.45.post1 arize-phoenix>=4.0.0 openai faiss-cpu sentence-transformers pandas streamlit matplotlib
    ```
 
 2. OpenAI API anahtarınızı bir çevre değişkeni olarak tanımlayın:
@@ -117,22 +118,34 @@ st.write("Yanıt:")
 st.write(response.message.content)
 ```
 
+### 8. Görselleştirme
+
+Uygulama, sorgu sonuçlarını sadece metin olarak değil, aynı zamanda görselleştirme ile de sunabilir. Kullanıcı sorgusuna göre uygun bir grafik oluşturulması gerekiyorsa, `matplotlib` kullanılarak dinamik grafikler oluşturulur. Örneğin, bir sütun grafiği, çubuk grafiği veya çizgi grafiği gibi görselleştirmeler, kullanıcıya sonuçları daha anlamlı bir şekilde sunmak için kullanılabilir.
+
+```python
+fig, ax = plt.subplots()
+# Grafiklerin oluşturulması burada yapılır.
+st.pyplot(fig=fig)
+```
+
+Bu özellik, kullanıcıların verilerini daha iyi anlamalarına yardımcı olur ve analizlerini daha görsel hale getirir.
+
 ## Kullanım
 
 1. Uygulamayı başlatmak için şu komutu çalıştırın:
 
    ```bash
-   streamlit run CwcsvwRAG.py
+   streamlit run <main>.py
    ```
 
 2. Web arayüzünde bir CSV dosyası yükleyin.
 
 3. Sorgunuzu girin. Örneğin, "Konya'dan başarılı kaç istek gelmiştir?" gibi bir sorgu yazabilirsiniz.
 
-4. Uygulama, en uygun sütunları seçerek sorguyu çalıştıracak ve sonuçları gösterecektir.
+4. Uygulama, en uygun sütunları seçerek sorguyu çalıştıracak, sonuçları gösterecek ve gerekiyorsa uygun bir grafik oluşturacaktır.
 
 5. https://cs8q9jzbzelbehrgbvuucu.streamlit.app ilgili linkten sistemin çalışır haline ulaştıktan sonra CSV dosyanızı yükleyip istediğiniz sorguları gerçekleştirebilirsiniz.
 
 ## Sonuç
 
-Bu proje, LLM'ler ve semantik arama algoritmalarını kullanarak CSV dosyaları üzerinde esnek ve kullanıcı dostu sorgulama yapılmasını sağlar. FAISS ve SentenceTransformers ile sütunları semantik olarak anlamlandırarak, kullanıcının amacına en uygun verileri bulur ve sunar. Bu tür uygulamalar, büyük veri kümeleriyle çalışırken kullanıcıların daha verimli analiz yapmasını sağlar.
+Bu proje, LLM'ler ve semantik arama algoritmalarını kullanarak CSV dosyaları üzerinde esnek ve kullanıcı dostu sorgulama yapılmasını sağlar. FAISS ve SentenceTransformers ile sütunları semantik olarak anlamlandırarak, kullanıcının amacına en uygun verileri bulur ve sunar. Aynı zamanda görselleştirme yetenekleri ile sonuçları daha anlaşılır hale getirir. Bu tür uygulamalar, büyük veri kümeleriyle çalışırken kullanıcıların daha verimli analiz yapmasını sağlar.
