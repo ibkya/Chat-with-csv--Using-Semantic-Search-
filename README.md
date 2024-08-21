@@ -131,7 +131,7 @@ st.write(response.message.content)
 
 4. Uygulama, en uygun sütunları seçerek sorguyu çalıştıracak ve sonuçları gösterecektir.
 
-5. https://zvjg288j9bxi9hgd8vdetb.streamlit.app ilgili linkten sistemin çalışır haline ulaştıktan sonra CSV dosyanızı yükleyip istediğiniz sorguları gerçekleştirebilirsiniz.
+5. https://cs8q9jzbzelbehrgbvuucu.streamlit.app ilgili linkten sistemin çalışır haline ulaştıktan sonra CSV dosyanızı yükleyip istediğiniz sorguları gerçekleştirebilirsiniz.
 
 ## Sonuç
 
