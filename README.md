@@ -1,5 +1,5 @@
 
-# CSV Dosyası Yükleme ve Semantik Arama Uygulaması için Dokümantasyon
+# CSV Dosyası Yükleme ve Semantik Arama Uygulaması
 
 ## Giriş
 
