@@ -133,7 +133,7 @@ if uploaded_file is not None:
 
 #Her zaman bir grafik oluşturmaması için böylesine basit bir sorgu ile her sorguda grafik oluşturmamasını sağladık. Farkındayım kötü bir koşul işlemi ama inanılmaz derecede uğraştım fakat bir türlü llm1'in kod çıktısına ulaşamadım. O yüzden ne kadar optimize çalışmasa da bir çözüm üretmeye çalıştım.
 
-            if "grafik" in response.message.content: 
+            if "visualize" in response.message.content: 
                 st.session_state['fig'] = fig
                 st.pyplot(fig=fig)
                 plt.close(fig)
