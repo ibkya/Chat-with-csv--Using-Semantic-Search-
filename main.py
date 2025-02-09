@@ -71,7 +71,7 @@ if uploaded_file is not None:
                 "Kodu `eval()` fonksiyonu ile çalıştırılabilir bir Python ifadesi olarak bitir.\n"
                 "SADECE İFADEYİ YAZDIR.\n"
                 "İfadeyi tırnak içine alma.\n"
-                "Sadece İngilizce dilini kullan.\n"
+                "Sadece Türkçe dilini kullan.\n"
             )
 
             pandas_prompt_str = (
