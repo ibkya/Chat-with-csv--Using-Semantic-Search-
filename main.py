@@ -64,39 +64,35 @@ if uploaded_file is not None:
             
             #Pandas sorgusu için talimatları dinamik olarak oluşturmak üzere bir prompt engineering yapıyoruz.
             instruction_str = (
-                    f"Translate the query into Python code that can be executed with Pandas, using only the columns: {', '.join(selected_columns)}.\n"
-                    "If complex operations are needed, consider using functions like grouping, aggregation, merging, or reshaping.\n"
-                    "If a plot is requested, consider creating the appropriate plot using matplotlib.\n"
-                    "Handle missing data appropriately.\n"
-                    "End the code with a Python expression that can be executed with the `eval()` function.\n"
-                    "PRINT ONLY THE EXPRESSION.\n"
-                    "Do not enclose the expression in quotes.\n"
-                    "Use only the English language.\n"
-                )
+                f"Sorguyu yalnızca şu sütunları kullanarak Pandas ile çalıştırılabilir bir Python koduna çevir: {', '.join(selected_columns)}.\n"
+                "Eğer karmaşık işlemler gerekiyorsa, gruplama, toplama, birleştirme veya yeniden şekillendirme gibi fonksiyonları kullanmayı düşün.\n"
+                "Eğer bir grafik isteniyorsa, matplotlib kullanarak uygun bir grafik oluşturmayı düşün.\n"
+                "Eksik verileri uygun şekilde işle.\n"
+                "Kodu `eval()` fonksiyonu ile çalıştırılabilir bir Python ifadesi olarak bitir.\n"
+                "SADECE İFADEYİ YAZDIR.\n"
+                "İfadeyi tırnak içine alma.\n"
+                "Sadece İngilizce dilini kullan.\n"
+            )
 
             pandas_prompt_str = (
-                    "You are working with a pandas dataframe in Python.\n"
-                    "The name of the dataframe is `df`.\n"
-                    "This is the result of `print(df.head())`:\n"
-                    "{df_str}\n\n"
-                    "Follow these instructions:\n"
-                    "{instruction_str}\n"
-                    "Query: {query_str}\n\n"
-                    "Expression:"
-                )
+                "Python'da bir pandas dataframe ile çalışıyorsun.\n"
+                "Dataframe'in adı `df`.\n"
+                "Bu, `print(df.head())` çıktısıdır:\n"
+                "{df_str}\n\n"
+                "Şu talimatları uygula:\n"
+                "{instruction_str}\n"
+                "Sorgu: {query_str}\n\n"
+                "İfade:"
+            )
 
-            pandas_prompt = PromptTemplate(pandas_prompt_str).partial_format(
-                    instruction_str=instruction_str, df_str=df[selected_columns].head(5)
-                )
-            
-            pandas_output_parser = PandasInstructionParser(df[selected_columns])
             response_synthesis_prompt = PromptTemplate(
-                    "Generate a detailed response from the query results based on your input.\n"
-                    "Query: {query_str}\n\n"
-                    "Pandas Instructions:\n{pandas_instructions}\n\n"
-                    "Pandas Output: {pandas_output}\n\n"
-                    "Response: "
-                )
+                "Girdiğiniz sorguya göre sonuçlardan detaylı bir yanıt oluştur.\n"
+                "Sorgu: {query_str}\n\n"
+                "Pandas Talimatları:\n{pandas_instructions}\n\n"
+                "Pandas Çıktısı: {pandas_output}\n\n"
+                "Yanıt: "
+            )
+
 
 
             #Genel işleyişin bir ilerleme mimarisini kurmak için QueryPipeline oluşturuyoruz.
