@@ -137,5 +137,3 @@ if uploaded_file is not None:
                 st.session_state['fig'] = fig
                 st.pyplot(fig=fig)
                 plt.close(fig)
-
-bu sistemi türkçeye çevirmek istiyorum promptların yapısını bozmadan türkçeye çevirir misin? sadece promptları
