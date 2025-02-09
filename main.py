@@ -10,59 +10,57 @@ import os
 import matplotlib.pyplot as plt
 
 
-#API Anahtarı (Size gönderilen linkten direkt sorgularınızı çalıştırabilirsiniz. Projede hali hazırda bir API bağlı.)
+# API Anahtarı
 api_key = os.getenv("OPENAI_API_KEY")
 
 # Streamlit başlat
 st.title("Chat with Excel and Visualize!")
-st.write("Upload csv and lets start!")
+st.write("Upload csv and let's start!")
 
-#LLM seçimi(İstenilen LLM modeli implemente edilebilir. Şu anlık sunucu ücretsiz olduğu için sadece OpenAI desteklenmektedir.)
-model_type = st.selectbox("Chose your model", ["Llama-3.1:8B","Llama-3.1:70B(Offline(Bellek sorunu))"])
+# LLM seçimi
+model_type = st.selectbox("Choose your model", ["Llama-3.1:8B", "Llama-3.1:70B (Offline - Bellek Sorunu)"])
 llm = OpenAI(model="gpt-3.5-turbo")
 
-#CSV dosyasınızı yükleme kısmı
-uploaded_file = st.file_uploader("Upload a Excel File", type=["csv"])
+# CSV dosyası yükleme
+uploaded_file = st.file_uploader("Upload an Excel File", type=["csv"])
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
     st.write("Uploaded File:")
     st.write(df.head())
 
-    #SentenceTransformer modelini yükleme bu kodu çalıştırdığınızda hugging face üzerinden direkt indirmeye başlayacaktır.
+    # SentenceTransformer modelini yükleme
     model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
 
-    #Sütun adlarını vektörleştiriyoruz çünkü kullanıcının sorgusuna en uygun sütunları çekip özel sorgularımızı sadece o seçilen sütunlar üzerinden gerçekleştireceğiz.
+    # Sütun adlarını vektörleştirme
     column_embeddings = model.encode(df.columns.tolist())
-
-    #FAISS dizini oluşturma (Kosinüs Benzerliği kullanarak semantik arama için L2 Regulatörü ile normalize ediyoruz.)
+    
+    # FAISS dizini oluşturma
     faiss.normalize_L2(column_embeddings)
-    d = column_embeddings.shape[1]  #Vektör boyutunu belirliyoruz.
-    index = faiss.IndexFlatIP(d)  #Inner Product (Kosinüs Benzerliği için kullanıyoruz.)
+    d = column_embeddings.shape[1]
+    index = faiss.IndexFlatIP(d)
+    index.add(column_embeddings)
 
-    index.add(column_embeddings)  #Tüm sütun vektörlerini vektörize veritabanımıza ekliyoruz.
-
-    #Kullanıcının arayüz üzerinden bir sorgu girebilmesi için alan açıyoruz.
+    # Kullanıcıdan sorgu girişi
     query_str = st.text_input("Type Here:", value="")
 
     if query_str:
-        #Kullanıcıdan gelen sorguyu vektörleştirip ve normalize ediyoruz.
+        # Kullanıcı sorgusunu vektörleştirip normalize etme
         query_embedding = model.encode([query_str])
         faiss.normalize_L2(query_embedding)
 
-        #FAISS veritabanımızdan en yakın sütunları sorguluyoruz.
-        k = 3  #k paramtresi ile en yakın kaç sütunu bulmak istediğimizi belirtiyoruz.
-        distances, indices = index.search(query_embedding, k) #Vektörize veritabanında sorgumuzu gerçekleştiriyoruz.
-        relevant_columns = [df.columns[i] for i in indices[0]] #Sütunları bir değişkene atayıp diğer adımda ekrana bastırıyoruz.
+        # FAISS ile en yakın sütunları bulma
+        k = 3
+        distances, indices = index.search(query_embedding, k)
+        relevant_columns = [df.columns[i] for i in indices[0]]
         
-        st.write("Similar Columns", relevant_columns)
+        st.write("Similar Columns:", relevant_columns)
 
-        #Sadece belirlenen sütunlar üzerinden bir sorgu üretebilmek adına sisteme sadece seçilen sütunları gönderiyoruz.
         if relevant_columns:
-            selected_columns = relevant_columns  #En yakın sütunları veriyoruz.
+            selected_columns = relevant_columns
             st.write(f"Similar Columns: {selected_columns}")
-            
-            #Pandas sorgusu için talimatları dinamik olarak oluşturmak üzere bir prompt engineering yapıyoruz.
+
+            # Pandas sorgusu için talimatları oluşturma
             instruction_str = (
                 f"Sorguyu yalnızca şu sütunları kullanarak Pandas ile çalıştırılabilir bir Python koduna çevir: {', '.join(selected_columns)}.\n"
                 "Eğer karmaşık işlemler gerekiyorsa, gruplama, toplama, birleştirme veya yeniden şekillendirme gibi fonksiyonları kullanmayı düşün.\n"
@@ -93,9 +91,11 @@ if uploaded_file is not None:
                 "Yanıt: "
             )
 
+            # Eksik değişkenleri tanımla
+            pandas_prompt = PromptTemplate(pandas_prompt_str)
+            pandas_output_parser = PandasInstructionParser()
 
-
-            #Genel işleyişin bir ilerleme mimarisini kurmak için QueryPipeline oluşturuyoruz.
+            # QueryPipeline oluştur
             qp = QP(
                 modules={
                     "input": InputComponent(),
@@ -107,6 +107,7 @@ if uploaded_file is not None:
                 },
                 verbose=True,
             )
+
             qp.add_chain(["input", "pandas_prompt", "llm1", "pandas_output_parser"])
             qp.add_links(
                 [
@@ -120,17 +121,16 @@ if uploaded_file is not None:
                 ]
             )
             qp.add_link("response_synthesis_prompt", "llm2")
+
             fig, ax = plt.subplots()
-            #Gelen sorguyu oluşturduğumuz işleyiş mimarisine aktarıp sistemi çalıştırıyoruz.
+
+            # QueryPipeline çalıştır
             response = qp.run(query_str=query_str)
             st.write("Response:")
             st.write(response.message.content)
 
-
-#Her zaman bir grafik oluşturmaması için böylesine basit bir sorgu ile her sorguda grafik oluşturmamasını sağladık. Farkındayım kötü bir koşul işlemi ama inanılmaz derecede uğraştım fakat bir türlü llm1'in kod çıktısına ulaşamadım. O yüzden ne kadar optimize çalışmasa da bir çözüm üretmeye çalıştım.
-
-            if "visualize" in response.message.content: 
+            # Grafik oluşturma koşulu
+            if "visualize" in response.message.content:
                 st.session_state['fig'] = fig
                 st.pyplot(fig=fig)
                 plt.close(fig)
-
