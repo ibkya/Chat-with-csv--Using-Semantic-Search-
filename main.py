@@ -46,59 +46,60 @@ if uploaded_file is not None:
     query_str = st.text_input("Type Here:", value="")
 
     if query_str:
-        # Kullanıcıdan gelen sorguyu vektörleştirip ve normalize ediyoruz.
+        #Kullanıcıdan gelen sorguyu vektörleştirip ve normalize ediyoruz.
         query_embedding = model.encode([query_str])
         faiss.normalize_L2(query_embedding)
 
-        # FAISS veritabanımızdan en yakın sütunları sorguluyoruz.
-        k = 3  # k parametresi ile en yakın kaç sütunu bulmak istediğimizi belirtiyoruz.
-        distances, indices = index.search(query_embedding, k)  # Vektörize veritabanında sorgumuzu gerçekleştiriyoruz.
-        relevant_columns = [df.columns[i] for i in indices[0]]  # Sütunları bir değişkene atayıp diğer adımda ekrana bastırıyoruz.
+        #FAISS veritabanımızdan en yakın sütunları sorguluyoruz.
+        k = 3  #k paramtresi ile en yakın kaç sütunu bulmak istediğimizi belirtiyoruz.
+        distances, indices = index.search(query_embedding, k) #Vektörize veritabanında sorgumuzu gerçekleştiriyoruz.
+        relevant_columns = [df.columns[i] for i in indices[0]] #Sütunları bir değişkene atayıp diğer adımda ekrana bastırıyoruz.
+        
+        st.write("Similar Columns", relevant_columns)
 
-        st.write("Benzer Sütunlar", relevant_columns)
-
-        # Sadece belirlenen sütunlar üzerinden bir sorgu üretebilmek adına sisteme sadece seçilen sütunları gönderiyoruz.
+        #Sadece belirlenen sütunlar üzerinden bir sorgu üretebilmek adına sisteme sadece seçilen sütunları gönderiyoruz.
         if relevant_columns:
-            selected_columns = relevant_columns  # En yakın sütunları veriyoruz.
-            st.write(f"Benzer Sütunlar: {selected_columns}")
-
-            # Pandas sorgusu için talimatları dinamik olarak oluşturmak üzere bir prompt engineering yapıyoruz.
+            selected_columns = relevant_columns  #En yakın sütunları veriyoruz.
+            st.write(f"Similar Columns: {selected_columns}")
+            
+            #Pandas sorgusu için talimatları dinamik olarak oluşturmak üzere bir prompt engineering yapıyoruz.
             instruction_str = (
-                    f"Sorguyu yalnızca şu sütunları kullanarak Pandas ile çalıştırılabilir bir Python koduna çevir: {', '.join(selected_columns)}.\n"
-                    "Eğer karmaşık işlemler gerekiyorsa, gruplama, toplama, birleştirme veya yeniden şekillendirme gibi fonksiyonları kullanabilirsin.\n"
-                    "Eğer bir grafik istendiyse, matplotlib kullanarak uygun bir grafik oluşturmayı düşün.\n"
-                    "Eksik verileri uygun şekilde işle.\n"
-                    "Kodu, `eval()` fonksiyonu ile çalıştırılabilecek bir Python ifadesiyle bitir.\n"
-                    "SADECE İFADEYİ YAZDIR.\n"
-                    "İfadeyi tırnak içine alma.\n"
-                    "Sadece Türkçe kullan.\n"
+                    f"Translate the query into Python code that can be executed with Pandas, using only the columns: {', '.join(selected_columns)}.\n"
+                    "If complex operations are needed, consider using functions like grouping, aggregation, merging, or reshaping.\n"
+                    "If a plot is requested, consider creating the appropriate plot using matplotlib.\n"
+                    "Handle missing data appropriately.\n"
+                    "End the code with a Python expression that can be executed with the `eval()` function.\n"
+                    "PRINT ONLY THE EXPRESSION.\n"
+                    "Do not enclose the expression in quotes.\n"
+                    "Use only the English language.\n"
                 )
 
             pandas_prompt_str = (
-                    "Python'da bir pandas dataframe'i ile çalışıyorsun.\n"
-                    "Dataframe'in adı `df`.\n"
-                    "İşte `print(df.head())` çıktısı:\n"
+                    "You are working with a pandas dataframe in Python.\n"
+                    "The name of the dataframe is `df`.\n"
+                    "This is the result of `print(df.head())`:\n"
                     "{df_str}\n\n"
-                    "Aşağıdaki talimatları takip et:\n"
+                    "Follow these instructions:\n"
                     "{instruction_str}\n"
-                    "Sorgu: {query_str}\n\n"
-                    "İfade:"
+                    "Query: {query_str}\n\n"
+                    "Expression:"
                 )
 
             pandas_prompt = PromptTemplate(pandas_prompt_str).partial_format(
                     instruction_str=instruction_str, df_str=df[selected_columns].head(5)
                 )
-
+            
             pandas_output_parser = PandasInstructionParser(df[selected_columns])
             response_synthesis_prompt = PromptTemplate(
-                    "Girdiğine dayanarak sorgu sonuçlarından ayrıntılı bir yanıt oluştur.\n"
-                    "Sorgu: {query_str}\n\n"
-                    "Pandas Talimatları:\n{pandas_instructions}\n\n"
-                    "Pandas Çıktısı: {pandas_output}\n\n"
-                    "Yanıt: "
+                    "Generate a detailed response from the query results based on your input.\n"
+                    "Query: {query_str}\n\n"
+                    "Pandas Instructions:\n{pandas_instructions}\n\n"
+                    "Pandas Output: {pandas_output}\n\n"
+                    "Response: "
                 )
 
-            # Genel işleyişin bir ilerleme mimarisini kurmak için QueryPipeline oluşturuyoruz.
+
+            #Genel işleyişin bir ilerleme mimarisini kurmak için QueryPipeline oluşturuyoruz.
             qp = QP(
                 modules={
                     "input": InputComponent(),
@@ -124,10 +125,13 @@ if uploaded_file is not None:
             )
             qp.add_link("response_synthesis_prompt", "llm2")
             fig, ax = plt.subplots()
-            # Gelen sorguyu oluşturduğumuz işleyiş mimarisine aktarıp sistemi çalıştırıyoruz.
+            #Gelen sorguyu oluşturduğumuz işleyiş mimarisine aktarıp sistemi çalıştırıyoruz.
             response = qp.run(query_str=query_str)
-            st.write("Yanıt:")
+            st.write("Response:")
             st.write(response.message.content)
+
+
+benim böyle bir yapım var şu an ingilzice çalışıyor fakat ben bunun promptlarını türkçeye çevirmek istiyorum yardım eder misin
 
 #Her zaman bir grafik oluşturmaması için böylesine basit bir sorgu ile her sorguda grafik oluşturmamasını sağladık. Farkındayım kötü bir koşul işlemi ama inanılmaz derecede uğraştım fakat bir türlü llm1'in kod çıktısına ulaşamadım. O yüzden ne kadar optimize çalışmasa da bir çözüm üretmeye çalıştım.
 
