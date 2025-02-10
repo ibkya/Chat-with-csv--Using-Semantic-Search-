@@ -131,7 +131,6 @@ if uploaded_file is not None:
             st.write(response.message.content)
 
 
-benim böyle bir yapım var şu an ingilzice çalışıyor fakat ben bunun promptlarını türkçeye çevirmek istiyorum yardım eder misin
 
 #Her zaman bir grafik oluşturmaması için böylesine basit bir sorgu ile her sorguda grafik oluşturmamasını sağladık. Farkındayım kötü bir koşul işlemi ama inanılmaz derecede uğraştım fakat bir türlü llm1'in kod çıktısına ulaşamadım. O yüzden ne kadar optimize çalışmasa da bir çözüm üretmeye çalıştım.
 
